@@ -27,7 +27,6 @@ class Answers(Resource):
         parser.add_argument('_id', required=False)
         for var in all_variables:
             parser.add_argument(var, required=False)
-        print("the first part")
         args = parser.parse_args()
 
         # creating new document
@@ -36,11 +35,26 @@ class Answers(Resource):
         }
         for var in all_variables:
             new_data[var] = args[var]
+
         # adding new document
-        collection.update_one(new_data, {'$set': new_data}, upsert=True)
-        print("the third part")
-        # reading answers
-        return self.get(), 200
+        if len(args['_id']) == 24:
+            if self.check_user_input(args[var2], var2) == 'number':
+                if self.check_user_input(args[var1], var1) == 'string':
+                    collection.update_one(new_data, {'$set': new_data}, upsert=True)
+                    return self.get(), 200
+                else:
+                    return {
+                               'message': f"'{args[var1]}' is not a valid input for {var1}"
+                           }, 404
+            else:
+            # reading answers
+                return {
+                               'message': f"'{args[var2]}' is not a valid input for {var2}"
+                           }, 404
+        else:
+            return {
+                               'message': f"'{args['_id']}' is not a valid ID, please make sure it is 24 characters long"
+                           }, 404
 
     def delete(self):
         parser = reqparse.RequestParser()
@@ -63,3 +77,12 @@ class Answers(Resource):
             return {
                        'message': f"'{args['_id']}' user not found"
                    }, 404
+
+    def check_user_input(self, user_input, classification):
+        try:
+            if int(user_input):
+                if 15 < int(user_input) < 90:
+                    return "number"
+        except:
+            if str(user_input) == 'male' or str(user_input) == 'female':
+                return "string"
