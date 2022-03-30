@@ -10,6 +10,22 @@ var2 = 'age'
 all_variables = [var1, var2]
 
 
+def validationInput(argument, var_age):
+    if len(argument) == 0:
+        return f"'you cannot leave the {var_age} field empty"
+    if not argument.isnumeric():
+        return f"'{argument}' is not a valid input for {var_age}"
+    if not 5 < int(argument) < 100:
+        return f"'{argument}' is not a valid input for {var_age}, it must be between 5 and 100"
+    return None
+
+def validationInputGender(argument, var_gender):
+    if len(argument) == 0:
+        return f"'you cannot leave the {var_gender} field empty"
+    if argument != 'female' or argument != 'male':
+        return f" {argument} is not a valid input for {var_gender}, must be 'male' or 'female'"
+
+
 class Answers(Resource):
 
     def get(self):
@@ -22,11 +38,6 @@ class Answers(Resource):
             data.append(document)
         # data = map((self.change_to_string, list_document))
         return {'data': data}, 200
-
-    # def change_to_string(self, var):
-    #     dictionary: dict
-    #     dictionary[var] = str(dictionary[var])
-    #     return dictionary
 
 
 
@@ -45,10 +56,14 @@ class Answers(Resource):
         for var in all_variables:
             new_data[var] = args[var]
 
-        if self.validationInput(args[var2], var2):
-            return self.validationInput(args[var2], var2)
-        if self.validationInputGender(args[var1], var1):
-            return self.validationInputGender(args[var1], var1)
+        age_error = validationInput(args[var2], var2)
+        gender_error = validationInputGender(args[var1], var1)
+
+        if age_error:
+            return {'message': age_error}, 400
+
+        if gender_error:
+            return {'message': gender_error}, 400
         # adding new document
         else:
             collection.update_one(new_data, {'$set': new_data}, upsert=True)
@@ -73,26 +88,4 @@ class Answers(Resource):
                        'message': f"'{args[var1]}', '{args[var2]}' not found"
                    }, 404
 
-    def validationInput(self, argument, var_age):
-        if len(argument) == 0:
-            return {
-                       'message': f"'you cannot leave the {var_age} field empty"
-                   }, 404
-        if not argument.isnumeric():
-            return {
-                       'message': f"'{argument}' is not a valid input for {var_age}"
-                   }, 401
-        if not 5 < int(argument) < 100:
-            return {
-                       'message': f"'{argument}' is not a valid input for {var_age}, it must be between 5 and 100"
-                   }, 401
 
-    def validationInputGender(self, argument, var_gender):
-        if len(argument) == 0:
-            return {
-                       'message': f"'you cannot leave the {var_gender} field empty"
-                   }, 401
-        if argument != 'female' or argument != 'male':
-            return {
-                       'message': f" {argument} is not a valid input for {var_gender}, must be 'male' or 'female'"
-                   }, 401
