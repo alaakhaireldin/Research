@@ -35,21 +35,24 @@ class Answers(Resource):
     def post(self):
         parser = reqparse.RequestParser()
         for var in all_variables:
-            parser.add_argument(var, required=False)
+            parser.add_argument(var, required=True)
         args = parser.parse_args()
 
-        self.validationInput(args[var2], var2)
-        self.validationInputGender(args[var1], var1)
+
 
         # creating new document
         new_data = {}
         for var in all_variables:
             new_data[var] = args[var]
 
+        if self.validationInput(args[var2], var2):
+            return self.validationInput(args[var2], var2)
+        if self.validationInputGender(args[var1], var1):
+            return self.validationInputGender(args[var1], var1)
         # adding new document
-
-        # collection.update_one(new_data, {'$set': new_data}, upsert=True)
-        # return self.get(), 200
+        else:
+            collection.update_one(new_data, {'$set': new_data}, upsert=True)
+            return self.get(), 200
 
 
     def delete(self):
@@ -71,21 +74,21 @@ class Answers(Resource):
                    }, 404
 
     def validationInput(self, argument, var_age):
-        if not hasattr(argument, var_age):
+        if len(argument) == 0:
             return {
                        'message': f"'you cannot leave the {var_age} field empty"
                    }, 404
-        if not argument.isnumeric(argument):
+        if not argument.isnumeric():
             return {
                        'message': f"'{argument}' is not a valid input for {var_age}"
                    }, 401
-        if not 5 < argument < 100:
+        if not 5 < int(argument) < 100:
             return {
                        'message': f"'{argument}' is not a valid input for {var_age}, it must be between 5 and 100"
                    }, 401
 
     def validationInputGender(self, argument, var_gender):
-        if not hasattr(argument, var_gender):
+        if len(argument) == 0:
             return {
                        'message': f"'you cannot leave the {var_gender} field empty"
                    }, 401
