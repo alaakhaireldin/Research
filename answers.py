@@ -1,4 +1,4 @@
-from flask_restful import Resource, reqparse
+from flask_restful import Resource, reqparse, inputs
 from pymongo import *
 
 client = MongoClient('mongodb+srv://PythonApp:4X0LUM8zjS7Q@researchcluster.usrji.mongodb.net/myFirstDatabase?retryWrites=true&w=majority')
@@ -11,17 +11,11 @@ all_variables = [var1, var2]
 
 
 def validationInput(argument, var_age):
-    if len(argument) == 0:
-        return f"'you cannot leave the {var_age} field empty"
-    if not argument.isnumeric():
-        return f"'{argument}' is not a valid input for {var_age}"
     if not 5 < int(argument) < 100:
         return f"'{argument}' is not a valid input for {var_age}, it must be between 5 and 100"
     return None
 
 def validationInputGender(argument, var_gender):
-    if len(argument) == 0:
-        return f"'you cannot leave the {var_gender} field empty"
     if argument != 'female' or argument != 'male':
         return f" {argument} is not a valid input for {var_gender}, must be 'male' or 'female'"
 
@@ -45,8 +39,10 @@ class Answers(Resource):
 
     def post(self):
         parser = reqparse.RequestParser()
-        for var in all_variables:
-            parser.add_argument(var, required=True)
+
+        parser.add_argument(var1, type=str, required=True, help='invalid input, gender must be male or female')
+        parser.add_argument(var2, type=int, required=True, help='invalid input, age must be number between 5 and 100')
+
         args = parser.parse_args()
 
 
