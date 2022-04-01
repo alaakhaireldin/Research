@@ -10,14 +10,16 @@ var2 = 'age'
 all_variables = [var1, var2]
 
 
-def validationInput(argument, var_age):
+def validationInput(argument):
     if not 5 < int(argument) < 100:
-        return f"'{argument}' is not a valid input for {var_age}, it must be between 5 and 100"
+        return f"'{argument}' is not a valid input for age, it must be between 5 and 100"
     return None
 
-def validationInputGender(argument, var_gender):
-    if argument != 'female' or argument != 'male':
-        return f" {argument} is not a valid input for {var_gender}, must be 'male' or 'female'"
+
+def validationInputGender(argument):
+    if argument != 'female' and argument != 'male':
+        return f" '{argument}' is not a valid input for gender, must be 'male' or 'female'"
+    return None
 
 
 class Answers(Resource):
@@ -52,13 +54,15 @@ class Answers(Resource):
         for var in all_variables:
             new_data[var] = args[var]
 
-        age_error = validationInput(args[var2], var2)
-        gender_error = validationInputGender(args[var1], var1)
+        gender_error = validationInputGender(args[var1])
+        age_error = validationInput(args[var2])
+
 
         if age_error:
             return {'message': age_error}, 400
 
         if gender_error:
+            print("hi")
             return {'message': gender_error}, 400
         # adding new document
         else:
