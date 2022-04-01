@@ -47,8 +47,6 @@ class Answers(Resource):
 
         args = parser.parse_args()
 
-
-
         # creating new document
         new_data = {}
         for var in all_variables:
@@ -62,7 +60,6 @@ class Answers(Resource):
             return {'message': age_error}, 400
 
         if gender_error:
-            print("hi")
             return {'message': gender_error}, 400
         # adding new document
         else:
@@ -76,7 +73,7 @@ class Answers(Resource):
         parser.add_argument(var2, required=True)
         args = parser.parse_args()
 
-        if collection.find_one({var1: str(args[var1])}) and collection.find_one({var2: str(args[var2])}):
+        if collection.find_one({var1: str(args[var1])}):
             # remove data entry
             collection.delete_one({var1: str(args[var1])})
             # reading answers
