@@ -16,12 +16,6 @@ def validationInput(argument):
     return None
 
 
-def validationInputGender(argument):
-    if argument != 'female' and argument != 'male':
-        return f" '{argument}' is not a valid input for gender, must be 'male' or 'female'"
-    return None
-
-
 class Answers(Resource):
 
     def get(self):
@@ -42,7 +36,7 @@ class Answers(Resource):
     def post(self):
         parser = reqparse.RequestParser()
 
-        parser.add_argument(var1, type=str, required=True, help='invalid input, gender must be male or female')
+        parser.add_argument(var1, type=str, choices=['female', 'male'], required=True, help='invalid input, gender must be male or female')
         parser.add_argument(var2, type=int, required=True, help='invalid input, age must be number between 5 and 100')
 
         args = parser.parse_args()
